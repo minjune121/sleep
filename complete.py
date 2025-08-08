@@ -16,9 +16,10 @@ import random
 app = Flask(__name__)
 
 # ====== 환경설정 ======
-GOOGLE_CREDS_PATH = "C:/Temp/SleepVoice/STTS.json"
-HUGGINGFACE_MODEL = "minjune121/my-kogpt-finetuned"
+GOOGLE_CREDS_PATH = "C:/Temp/SleepVoice/STTS.json" #구글 API
+HUGGINGFACE_MODEL = "minjune121/my-kogpt-finetuned" #만든 모델
 
+#조절절
 RATE = 16000
 CHANNELS = 1
 FORMAT = pyaudio.paInt16
@@ -128,11 +129,12 @@ def index():
 from flask import jsonify
 import base64
 
+#새 창에서 음성 대화 할 수 있게 함
 @app.route("/chat")
 def chat():
     return render_template("chat.html")
 
-
+#수면 친구 AI
 @app.route("/voice", methods=["POST"])
 def process_voice():
     if 'audio' not in request.files:
@@ -157,7 +159,7 @@ def process_voice():
     })
 
 
-
+#음성 테스트
 @app.route("/story-audio")
 def stream_story_audio():
     story = get_random_story_from_file("C:/Temp/SleepVoice/book_sleep.json")
@@ -170,6 +172,7 @@ def stream_story_audio():
         download_name="story.mp3"
     )
 
+#음성 재생
 @app.route("/story")
 def story():
     story = get_random_story_from_file("C:/Temp/SleepVoice/book_sleep.json")
@@ -187,3 +190,4 @@ def story():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
