@@ -7,7 +7,7 @@ from google.cloud import speech
 from google.oauth2 import service_account
 
 # ===== 설정 =====
-json_file = r"C:\Temp\SleepVoice\STTS.json"  # 서비스 계정 키 경로
+json_file = r"C:\Temp\SleepVoice\STTS.json"  # 구글 API json형태로 받아와야 함
 RATE = 16000
 CHANNELS = 1
 FORMAT = pyaudio.paInt16
@@ -76,9 +76,10 @@ def transcribe_audio(audio_buffer):
     )
     response = client.recognize(config=config, audio=audio)
     for result in response.results:
-        print("🗣 인식된 텍스트:", result.alternatives[0].transcript)
+        print("인식된 텍스트:", result.alternatives[0].transcript)
 
 if __name__ == "__main__":
     audio_bytes = record_until_silence()
     wav_buffer = audio_to_wav(audio_bytes)
     transcribe_audio(wav_buffer)
+
