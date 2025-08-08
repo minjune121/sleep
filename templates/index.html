@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>잠ON다</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>잠ON다</h1>
+    <button onclick="location.href='/chat'">수면친구와 대화하기</button>
+    <br><br>
+    <button onclick="location.href='/story'">동화 듣기</button>
+
+    <script>
+        async function startConversation() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                let chunks = [];
+
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(chunks, { 'type': 'audio/webm' });
+                    const formData = new FormData();
+                    formData.append('audio', blob);
+
+                    const response = await fetch('/voice', { method: 'POST', body: formData });
+                    if (!response.ok) throw new Error('서버 응답 실패');
+
+                    // 변경
+                        const data = await response.json();
+
+                        // 화면에 텍스트 보여주고 싶으면 (index.html에 적당한 div/요소가 있어야 함)
+                        console.log("사용자 말:", data.user_text);
+                        console.log("AI 답변:", data.bot_response);
+
+                        const audio = new Audio("data:audio/mp3;base64," + data.audio_base64);
+                        audio.play();
+
+                };
+
+                mediaRecorder.start();
+
+                // 녹음 시간 (예: 5초 후 종료)
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                    stream.getTracks().forEach(track => track.stop());
+                }, 5000);
+
+            } catch (e) {
+                console.error('음성 녹음/전송 실패:', e);
+            }
+        }
+    </script>
+</body>
+</html>

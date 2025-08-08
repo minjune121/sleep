@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>수면 친구와 대화하기</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    body {
+      max-width: 700px;
+      margin: 30px auto;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      text-align: center;
+    }
+    #conversation {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .user {
+      color: #333;
+      font-weight: 700;
+      margin-top: 15px;
+    }
+    .bot {
+      color: #6a5acd;
+      margin-bottom: 15px;
+      margin-left: 10px;
+    }
+    button {
+      background-color: #6a5acd;
+      border: none;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.2em;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #483d8b;
+    }
+    .back_to{
+        background-color: #6a5acd;
+        border: none;
+        color: white;
+        padding: 15px 40px;
+        font-size: 1.2em;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+    }
+    .back_to:hover{
+        background:#483d8b;
+    }
+  </style>
+</head>
+<body>
+  <h1>수면 친구와 대화하기</h1>
+
+  <div id="conversation"></div>
+  <button id="startBtn">말하기</button>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const conversation = document.getElementById("conversation");
+
+    startBtn.onclick = async () => {
+      startBtn.disabled = true;
+      startBtn.textContent = "녹음 중...";
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        let chunks = [];
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          const formData = new FormData();
+          formData.append("audio", blob);
+
+          const response = await fetch("/voice", { method: "POST", body: formData });
+          if (!response.ok) {
+            throw new Error("서버 응답 실패");
+          }
+          const data = await response.json();
+
+          // 대화 기록에 텍스트 추가
+          const userDiv = document.createElement("div");
+          userDiv.className = "user";
+          userDiv.textContent = `당신: ${data.user_text}`;
+          conversation.appendChild(userDiv);
+
+          const botDiv = document.createElement("div");
+          botDiv.className = "bot";
+          botDiv.textContent = `수면친구: ${data.bot_response}`;
+          conversation.appendChild(botDiv);
+
+          // 스크롤 하단 이동
+          conversation.scrollTop = conversation.scrollHeight;
+
+          // 오디오 재생
+          const audio = new Audio("data:audio/mp3;base64," + data.audio_base64);
+          audio.play();
+
+          startBtn.disabled = false;
+          startBtn.textContent = "말하기";
+        };
+
+        mediaRecorder.start();
+
+        // 5초 녹음 후 종료
+        setTimeout(() => {
+          mediaRecorder.stop();
+          stream.getTracks().forEach(track => track.stop());
+        }, 5000);
+
+      } catch (e) {
+        alert("녹음 실패: " + e.message);
+        startBtn.disabled = false;
+        startBtn.textContent = "말하기";
+      }
+    };
+  </script>
+  <button
+  onclick="location.href='/'"
+>
+  돌아가기
+</button>
+
+
+</body>
+</html>

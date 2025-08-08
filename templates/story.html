@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <style>
+        body {
+            max-width: 700px;
+            margin: 40px auto;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+        }
+        h1 {
+            color: #6a5acd;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+        }
+        audio {
+            outline: none;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(106, 90, 205, 0.3);
+        }
+        button {
+            background-color: #6a5acd;
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #483d8b;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <p>{{ text }}</p>
+    <audio controls autoplay>
+        <source src="{{ url_for('static', filename=audio_file) }}" type="audio/mpeg" />
+        브라우저가 오디오를 지원하지 않습니다.
+    </audio>
+    <button onclick="location.href='/'">← 돌아가기</button>
+</body>
+</html>
