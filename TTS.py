@@ -5,15 +5,15 @@ from google.cloud import texttospeech
 from google.oauth2 import service_account
 from pydub import AudioSegment
 
-# 🔐 1. 서비스 계정 인증
+# 서비스 계정 인증( 구글 API json 형태 )
 credentials = service_account.Credentials.from_service_account_file("C:/Temp/SleepVoice/STTS.json")
 client = texttospeech.TextToSpeechClient(credentials=credentials)
 
-# 🔠 2. 문장 분할 함수
+# 문장 분할
 def split_sentences(text):
     return re.split(r'(?<=[.?!])\s+', text.strip())
 
-# 🔊 3. TTS: 한 문장 합성 함수 (비동기)
+# TTS 조절
 async def synthesize_tts(text):
     synthesis_input = texttospeech.SynthesisInput(text=text)
     voice = texttospeech.VoiceSelectionParams(
@@ -35,7 +35,7 @@ async def synthesize_tts(text):
 
     return AudioSegment.from_file(io.BytesIO(response.audio_content), format="mp3")
 
-# 📦 4. 여러 문장을 하나의 오디오로 합친 후 메모리로 반환
+# 여러 문장을 하나의 오디오로 합친 후 메모리로 반환
 async def generate_tts_audio(text):
     sentences = split_sentences(text)
     audio_segments = []
@@ -50,11 +50,12 @@ async def generate_tts_audio(text):
     buffer.seek(0)
     return buffer
 
-# ✅ 5. 테스트 실행용 코드 (선택)
+# 테스트
 if __name__ == "__main__":
     sample_text = "안녕하세요. 잠이 안 오시나요? 좋은 꿈 꾸세요!"
     buffer = asyncio.run(generate_tts_audio(sample_text))
-    # 저장 테스트 (옵션)
+    # 저장
     with open("test_combined.mp3", "wb") as f:
         f.write(buffer.read())
-    print("✅ test_combined.mp3 저장 완료")
+    print("test_combined.mp3 저장 완료")
+
