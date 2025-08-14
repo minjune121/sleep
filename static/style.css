@@ -1,4 +1,4 @@
-/* static/style.css */
+d/* static/style.css */
 
 body {
   text-align: center;
@@ -22,8 +22,10 @@ button {
   color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  width: 400px; 
 }
 
 button:hover {
   background-color: #483d8b;
 }
+
